@@ -62,7 +62,7 @@ static int http_serve(ssl,s)
         berr_exit("SSL renegotiation error");
       if(SSL_do_handshake(ssl)<=0)
         berr_exit("SSL renegotiation error");
-      ssl->state=SSL_ST_ACCEPT;
+      SSL_set_accept_state(ssl);
       if(SSL_do_handshake(ssl)<=0)
         berr_exit("SSL renegotiation error");
     }

@@ -1,0 +1,27 @@
+#From the build directory, run the following commands on the command line
+
+#Create dhparam file
+openssl dhparam -out dh1024.pem 1024
+
+# Create the CA Key and Certificate for signing Client Certs
+openssl genrsa -des3 -out ca.key 4096
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt -subj "/C=US/ST=Oregon/L=Hillsboro/O=Company/OU=Company/CN=localhost" 
+cat ca.crt ca.key > root.pem
+
+# Create the Server Key, CSR, and Certificate
+openssl genrsa -des3 -out server.key 4096
+openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Oregon/L=Hillsboro/O=Company/OU=Company/CN=localhost" 
+openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAserial ./caserial -CAcreateserial -out server.crt -extfile ../server_cert_ext.cnf
+cat server.crt server.key > server.pem
+
+# Remove the password from the key (needed when it will be used
+# automatically eg. from a web server).
+#openssl rsa -in server.key -out server-np.key
+
+#Create a Client Key
+openssl genrsa -des3 -out client.key 4096
+openssl req -new -key client.key -out client.csr -subj "/C=US/ST=Oregon/L=Hillsboro/O=Company/OU=Company/CN=localhost" 
+openssl x509 -req -days 365 -in client.csr -CA ca.crt -CAkey ca.key -CAserial ./caserial -CAcreateserial -out client.crt  -extfile ../client_cert_ext.cnf
+cat client.crt client.key > client.pem
+
+#Instructions mostly based on tutorial found at - https://www.golinuxcloud.com/openssl-create-client-server-certificate/
